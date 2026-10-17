@@ -1,0 +1,360 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Registrasi Anggota',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF087F5B),
+        ),
+        useMaterial3: true,
+      ),
+      home: const RegistrasiPage(),
+    );
+  }
+}
+
+class RegistrasiPage extends StatefulWidget {
+  const RegistrasiPage({super.key});
+
+  @override
+  State<RegistrasiPage> createState() => _RegistrasiPageState();
+}
+
+class _RegistrasiPageState extends State<RegistrasiPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _namaController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  String? _jenisKelamin;
+  String? _divisi;
+  bool _setuju = false;
+
+  final List<String> _divisiList = [
+    'Badminton',
+    'Futsal',
+    'Bola Voli',
+    'Basket',
+    'Pengurus Organisasi',
+  ];
+
+  void _daftar() {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_jenisKelamin == null || _divisi == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silakan lengkapi semua pilihan.'),
+        ),
+      );
+      return;
+    }
+
+    if (!_setuju) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silakan setujui ketentuan pendaftaran.'),
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: const Icon(
+          Icons.verified,
+          color: Color(0xFF087F5B),
+          size: 50,
+        ),
+        title: const Text('Konfirmasi Pendaftaran'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Nama: ${_namaController.text}'),
+            Text('Email: ${_emailController.text}'),
+            Text('Jenis Kelamin: $_jenisKelamin'),
+            Text('Divisi: $_divisi'),
+            const SizedBox(height: 12),
+            const Text(
+              'Pastikan data yang dimasukkan sudah benar.',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Periksa Lagi'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Pendaftaran berhasil disimulasikan!',
+                  ),
+                  backgroundColor: Color(0xFF087F5B),
+                ),
+              );
+            },
+            child: const Text('Konfirmasi'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _namaController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const hijau = Color(0xFF087F5B);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF1F8F5),
+      appBar: AppBar(
+        title: const Text(
+          'Registrasi Anggota',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: hijau,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: Card(
+              color: Colors.white,
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const CircleAvatar(
+                        radius: 38,
+                        backgroundColor: Color(0xFFD8F3E8),
+                        child: Icon(
+                          Icons.groups,
+                          size: 42,
+                          color: hijau,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Gabung Bersama Kami!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 23,
+                          fontWeight: FontWeight.bold,
+                          color: hijau,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Isi formulir untuk menjadi bagian '
+                        'dari organisasi kami.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      const SizedBox(height: 28),
+
+                      TextFormField(
+                        controller: _namaController,
+                        decoration: const InputDecoration(
+                          labelText: 'Nama Lengkap',
+                          prefixIcon: Icon(Icons.person_outline),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null ||
+                              value.trim().isEmpty) {
+                            return 'Nama wajib diisi';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'Email Aktif',
+                          prefixIcon: Icon(Icons.email_outlined),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null ||
+                              value.trim().isEmpty) {
+                            return 'Email wajib diisi';
+                          }
+                          if (!RegExp(
+                            r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                          ).hasMatch(value.trim())) {
+                            return 'Format email tidak valid';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: Icon(Icons.lock_outline),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Password wajib diisi';
+                          }
+                          if (value.length < 6) {
+                            return 'Password minimal 6 karakter';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 22),
+
+                      const Text(
+                        'Jenis Kelamin',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      RadioGroup<String>(
+                        groupValue: _jenisKelamin,
+                        onChanged: (value) {
+                          setState(() {
+                            _jenisKelamin = value;
+                          });
+                        },
+                        child: const Column(
+                          children: [
+                            RadioListTile<String>(
+                              title: Text('Laki-laki'),
+                              value: 'Laki-laki',
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            RadioListTile<String>(
+                              title: Text('Perempuan'),
+                              value: 'Perempuan',
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      DropdownButtonFormField<String>(
+                        initialValue: _divisi,
+                        isExpanded: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Pilih Divisi',
+                          prefixIcon: Icon(Icons.sports),
+                          border: OutlineInputBorder(),
+                        ),
+                        hint: const Text('Pilih divisi organisasi'),
+                        items: _divisiList.map((divisi) {
+                          return DropdownMenuItem<String>(
+                            value: divisi,
+                            child: Text(divisi),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _divisi = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 12),
+
+                      CheckboxListTile(
+                        value: _setuju,
+                        contentPadding: EdgeInsets.zero,
+                        controlAffinity:
+                            ListTileControlAffinity.leading,
+                        title: const Text(
+                          'Saya menyetujui ketentuan pendaftaran.',
+                          style: TextStyle(fontSize: 13),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _setuju = value ?? false;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      SizedBox(
+                        height: 52,
+                        child: FilledButton.icon(
+                          onPressed: _daftar,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: hijau,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Icon(Icons.how_to_reg),
+                          label: const Text(
+                            'Daftar Sekarang',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Bersama, kita tumbuh dan berprestasi.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
