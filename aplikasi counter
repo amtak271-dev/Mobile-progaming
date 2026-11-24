@@ -1,0 +1,339 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+// =====================================
+// MAIN APP
+// =====================================
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Aplikasi Counter',
+      theme: ThemeData(primarySwatch: Colors.indigo, useMaterial3: true),
+      home: const CounterPage(),
+    );
+  }
+}
+
+// =====================================
+// COUNTER PAGE
+// =====================================
+
+class CounterPage extends StatefulWidget {
+  const CounterPage({super.key});
+
+  @override
+  State<CounterPage> createState() => _CounterPageState();
+}
+
+class _CounterPageState extends State<CounterPage> {
+  int counter = 0;
+
+  // Lifecycle initState
+  @override
+  void initState() {
+    super.initState();
+    debugPrint('Counter dimulai');
+  }
+
+  // Lifecycle dispose
+  @override
+  void dispose() {
+    debugPrint('Counter ditutup');
+    super.dispose();
+  }
+
+  // Fungsi tambah
+  void tambahCounter() {
+    setState(() {
+      counter++;
+    });
+  }
+
+  // Fungsi kurang (tidak boleh minus)
+  void kurangCounter() {
+    if (counter > 0) {
+      setState(() {
+        counter--;
+      });
+    }
+  }
+
+  // Fungsi reset
+  void resetCounter() {
+    setState(() {
+      counter = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF1F3F8),
+
+      appBar: AppBar(
+        title: const Text(
+          'Aplikasi Counter',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.indigo,
+      ),
+
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+
+                  const Icon(
+                    Icons.calculate_rounded,
+                    size: 75,
+                    color: Colors.indigo,
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  const Text(
+                    'COUNTER APP',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  const Text(
+                    'Aplikasi penghitung angka sederhana',
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+
+                  const SizedBox(height: 35),
+
+                  // WIDGET COUNTER DISPLAY
+                  CounterDisplay(counter: counter),
+
+                  const SizedBox(height: 30),
+
+                  const Text(
+                    'PILIH OPERASI',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // WIDGET COUNTER BUTTONS
+                  CounterButtons(
+                    onAdd: tambahCounter,
+                    onSubtract: kurangCounter,
+                    onReset: resetCounter,
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // STATUS COUNTER
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.info_outline, color: Colors.indigo),
+                        const SizedBox(width: 10),
+                        Flexible(
+                          child: Text(
+                            counter == 0
+                                ? 'Counter masih bernilai nol'
+                                : 'Total hitungan: $counter',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// =====================================
+// COUNTER DISPLAY
+// =====================================
+
+class CounterDisplay extends StatelessWidget {
+  final int counter;
+
+  const CounterDisplay({super.key, required this.counter});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+
+      child: Column(
+        children: [
+          const Text(
+            'ANGKA COUNTER',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          Text(
+            '$counter',
+            style: const TextStyle(
+              fontSize: 85,
+              fontWeight: FontWeight.bold,
+              color: Colors.indigo,
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          Text(
+            counter == 0 ? 'Mulai menghitung!' : 'Tetap semangat!',
+            style: const TextStyle(color: Colors.black54, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// =====================================
+// COUNTER BUTTONS
+// =====================================
+
+class CounterButtons extends StatelessWidget {
+  final VoidCallback onAdd;
+  final VoidCallback onSubtract;
+  final VoidCallback onReset;
+
+  const CounterButtons({
+    super.key,
+    required this.onAdd,
+    required this.onSubtract,
+    required this.onReset,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // TOMBOL KURANG DAN TAMBAH
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 60,
+                child: ElevatedButton.icon(
+                  onPressed: onSubtract,
+                  icon: const Icon(Icons.remove),
+                  label: const Text(
+                    'KURANG',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: SizedBox(
+                height: 60,
+                child: ElevatedButton.icon(
+                  onPressed: onAdd,
+                  icon: const Icon(Icons.add),
+                  label: const Text(
+                    'TAMBAH',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 15),
+
+        // TOMBOL RESET
+        SizedBox(
+          width: double.infinity,
+          height: 58,
+          child: ElevatedButton.icon(
+            onPressed: onReset,
+            icon: const Icon(Icons.refresh),
+            label: const Text(
+              'RESET COUNTER',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
